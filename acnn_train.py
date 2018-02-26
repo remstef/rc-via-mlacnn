@@ -1,5 +1,5 @@
-import attention.data_pro as pro
-import attention.pyt_att as pa
+import data_pro as pro
+import pyt_acnn as pa
 import torch.utils.data as D
 import torch
 from torch.autograd import Variable
@@ -18,8 +18,8 @@ K = 3
 LR = 0.2
 BATCH_SIZE = 50
 epochs = 100
-data = pro.load_data('/home/dm/adg/remotetest/attention/train.txt')
-t_data = pro.load_data('/home/dm/adg/remotetest/attention/test.txt')
+data = pro.load_data('data/train.txt')
+t_data = pro.load_data('data/test.txt')
 word_dict = pro.build_dict(data[0])
 x, y, e1, e2, dist1, dist2 = pro.vectorize(data, word_dict, N)
 y = np.array(y).astype(np.int64)
@@ -31,8 +31,8 @@ eval_cat = np.concatenate(
     (e_x, np.array(e_e1).reshape(-1, 1), np.array(e_e2).reshape(-1, 1), np.array(e_dist1), np.array(e_dist2)), 1)
 
 tx, ty, te1, te2, td1, td2 = pro.vectorize(t_data, word_dict, N)
-embed_file = '/home/dm/adg/remotetest/attention/embeddings.txt'
-vac_file = '/home/dm/adg/remotetest/attention/words.lst'
+embed_file = 'data/embedding/senna/embeddings.txt'
+vac_file = 'data/embedding/senna/words.lst'
 embedding = pro.load_embedding(embed_file, vac_file, word_dict)
 
 model = pa.ACNN(N, embedding, DP, NP, K, NR, DC, KP).cuda()
