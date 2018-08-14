@@ -63,7 +63,7 @@ def prediction(wo, rel_weight, y, NR):
     correct = torch.eq(predict, y)
     # print(correct)
     acc = correct.sum().float() / float(correct.data.size()[0])
-    return (acc * 100).cpu().data.numpy()[0]
+    return (acc * 100).item()
 
 
 for i in range(epochs):
@@ -71,7 +71,7 @@ for i in range(epochs):
     loss = 0
     train = torch.from_numpy(np_cat.astype(np.int64))
     y_tensor = torch.LongTensor(y)
-    train_datasets = D.TensorDataset(data_tensor=train, target_tensor=y_tensor)
+    train_datasets = D.TensorDataset(train, y_tensor)
     train_dataloader = D.DataLoader(train_datasets, BATCH_SIZE, True, num_workers=2)
     j = 0
     for (b_x_cat, b_y) in train_dataloader:
@@ -88,14 +88,14 @@ for i in range(epochs):
     eval_acc = 0
     ti = 0
     y_tensor = torch.LongTensor(e_y)
-    eval_datasets = D.TensorDataset(data_tensor=eval, target_tensor=y_tensor)
+    eval_datasets = D.TensorDataset(eval, y_tensor)
     eval_dataloader = D.DataLoader(eval_datasets, BATCH_SIZE, True, num_workers=2)
     for (b_x_cat, b_y) in eval_dataloader:
         bx, be1, be2, bd1, bd2, by = data_unpack(b_x_cat, b_y)
         wo, rel_weight = model(bx, be1, be2, bd1, bd2, False)
         eval_acc += prediction(wo, rel_weight, by, NR)
         ti += 1
-    print('epoch:', i, 'acc:', acc / j, '%   loss:', loss.cpu().data.numpy()[0] / j, 'test_acc:', eval_acc / ti, '%')
+    print('epoch:', i, 'acc:', acc / j, '%   loss:', loss.item() / j, 'test_acc:', eval_acc / ti, '%')
 
 torch.save(model.state_dict(), 'acnn_params.pkl')
 # eval = torch.from_numpy(np_cat.astype(np.int64))

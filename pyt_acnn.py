@@ -57,7 +57,7 @@ class ACNN(nn.Module):
         self.We1 = nn.Parameter(torch.randn(self.dw, self.dw))
         self.We2 = nn.Parameter(torch.randn(self.dw, self.dw))
         self.max_pool = nn.MaxPool2d((1, self.dc), (1, self.dc))
-        self.softmax = nn.Softmax()
+        self.softmax = nn.Softmax(dim=1)
 
     def window_cat(self, x_concat):
         s = x_concat.data.size()
@@ -107,13 +107,14 @@ class ACNN(nn.Module):
         b_rel_w = rel_weight.view(1, self.nr, self.dc).repeat(bz, 1, 1)
         G = torch.bmm(R_star.transpose(2, 1), b_U)  # (bz, n, nr)
         G = torch.bmm(G, b_rel_w)  # (bz, n, dc)
-        AP = F.softmax(G)
+        AP = F.softmax(G, dim=1)
         AP = AP.view(bz, self.n, self.dc)
         wo = torch.bmm(R_star, AP)  # bz, dc, dc
         wo = self.max_pool(wo.view(bz, 1, self.dc, self.dc))
         return wo.view(bz, 1, self.dc).view(bz, self.dc), rel_weight
 
     def forward(self, x, e1, e2, dist1, dist2, is_training=True):
+        import pdb; pdb.set_trace()
         R = self.new_input_attention(x, e1, e2, dist1, dist2, is_training)
         R_star = self.new_convolution(R)
         wo, rel_weight = self.attentive_pooling(R_star)
