@@ -5,7 +5,9 @@ import torch
 from torch.autograd import Variable
 import numpy as np
 import torch.nn.functional as F
+from tqdm import tqdm
 from sklearn.model_selection import KFold
+
 
 DW = 100
 N = 123
@@ -79,7 +81,7 @@ for i in range(epochs):
     train_datasets = D.TensorDataset(train, y_tensor)
     train_dataloader = D.DataLoader(train_datasets, BATCH_SIZE, True, num_workers=2)
     j = 0
-    for (b_x_cat, b_y) in train_dataloader:
+    for (b_x_cat, b_y) in tqdm(train_dataloader, ncols=80, desc='train'):
         bx, be1, be2, bd1, bd2, by = data_unpack(b_x_cat, b_y)
         wo, rel_weight = model(bx, be1, be2, bd1, bd2)
         acc += prediction(wo, rel_weight, by, NR)
@@ -95,7 +97,7 @@ for i in range(epochs):
     y_tensor = torch.LongTensor(e_y)
     eval_datasets = D.TensorDataset(eval, y_tensor)
     eval_dataloader = D.DataLoader(eval_datasets, BATCH_SIZE, True, num_workers=2)
-    for (b_x_cat, b_y) in eval_dataloader:
+    for (b_x_cat, b_y) in tqdm(eval_dataloader, ncols=80, desc='eval'):
         bx, be1, be2, bd1, bd2, by = data_unpack(b_x_cat, b_y)
         wo, rel_weight = model(bx, be1, be2, bd1, bd2, False)
         eval_acc += prediction(wo, rel_weight, by, NR)
