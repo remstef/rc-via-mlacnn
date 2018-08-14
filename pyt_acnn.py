@@ -13,13 +13,13 @@ def one_hot(indices, depth, on_value=1, off_value=0):
         for i in range(np_ids.shape[0]):
             for j in range(np_ids.shape[1]):
                 added[i, j, np_ids[i, j]] = on_value
-        return Variable(torch.FloatTensor(added.astype(float))).cuda()
+        return Variable(torch.FloatTensor(added.astype(float))).to(indices.device)
     if len(np_ids.shape) == 1:
         encoding = np.zeros([np_ids.shape[0], depth], dtype=int)
         added = encoding + off_value
         for i in range(np_ids.shape[0]):
             added[i, np_ids[i]] = on_value
-        return Variable(torch.FloatTensor(added.astype(float))).cuda()
+        return Variable(torch.FloatTensor(added.astype(float))).to(indices.device)
 
 
 class ACNN(nn.Module):
@@ -62,9 +62,9 @@ class ACNN(nn.Module):
     def window_cat(self, x_concat):
         s = x_concat.data.size()
         px = self.pad(x_concat.view(s[0], 1, s[1], s[2])).view(s[0], s[1] + 2 * self.p, s[2])
-        t_px = torch.index_select(px, 1, Variable(torch.LongTensor(range(s[1]))).cuda())
-        m_px = torch.index_select(px, 1, Variable(torch.LongTensor(range(1, s[1] + 1))).cuda())
-        b_px = torch.index_select(px, 1, Variable(torch.LongTensor(range(2, s[1] + 2))).cuda())
+        t_px = torch.index_select(px, 1, Variable(torch.LongTensor(range(s[1]))).to(x_concat.device))
+        m_px = torch.index_select(px, 1, Variable(torch.LongTensor(range(1, s[1] + 1))).to(x_concat.device))
+        b_px = torch.index_select(px, 1, Variable(torch.LongTensor(range(2, s[1] + 2))).to(x_concat.device))
         return torch.cat([t_px, m_px, b_px], 2)
 
     def new_input_attention(self, x, e1, e2, dist1, dist2, is_training=True):

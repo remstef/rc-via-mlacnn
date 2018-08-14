@@ -18,6 +18,11 @@ K = 3
 LR = 0.2
 BATCH_SIZE = 50
 epochs = 100
+seed = 1111
+
+torch.manual_seed(seed)
+device = torch.device('cuda' if torch.cuda.is_available() and True else 'cpu')
+
 data = pro.load_data('data/train.txt')
 t_data = pro.load_data('data/test.txt')
 word_dict = pro.build_dict(data[0])
@@ -35,19 +40,19 @@ embed_file = 'data/embedding/senna/embeddings.txt'
 vac_file = 'data/embedding/senna/words.lst'
 embedding = pro.load_embedding(embed_file, vac_file, word_dict)
 
-model = pa.ACNN(N, embedding, DP, NP, K, NR, DC, KP).cuda()
+model = pa.ACNN(N, embedding, DP, NP, K, NR, DC, KP).to(device)
 optimizer = torch.optim.SGD(model.parameters(), lr=LR)  # optimize all rnn parameters
 loss_func = pa.NovelDistanceLoss(NR)
 
 
 def data_unpack(cat_data, target):
     list_x = np.split(cat_data.numpy(), [N, N + 1, N + 2, N + 2 + NP], 1)
-    bx = Variable(torch.from_numpy(list_x[0])).cuda()
-    be1 = Variable(torch.from_numpy(list_x[1])).cuda()
-    be2 = Variable(torch.from_numpy(list_x[2])).cuda()
-    bd1 = Variable(torch.from_numpy(list_x[3])).cuda()
-    bd2 = Variable(torch.from_numpy(list_x[4])).cuda()
-    target = Variable(target).cuda()
+    bx = Variable(torch.from_numpy(list_x[0])).to(device)
+    be1 = Variable(torch.from_numpy(list_x[1])).to(device)
+    be2 = Variable(torch.from_numpy(list_x[2])).to(device)
+    bd1 = Variable(torch.from_numpy(list_x[3])).to(device)
+    bd2 = Variable(torch.from_numpy(list_x[4])).to(device)
+    target = Variable(target).to(device)
     return bx, be1, be2, bd1, bd2, target
 
 
