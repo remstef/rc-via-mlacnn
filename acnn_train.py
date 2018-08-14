@@ -102,7 +102,7 @@ for i in tqdm(range(epochs), ncols=80):
         wo, rel_weight = model(bx, be1, be2, bd1, bd2, False)
         eval_acc += prediction(wo, rel_weight, by, NR)
         ti += 1
-    tqdm.write('epoch:', i, 'acc:', acc / j, '%   loss:', loss.item() / j, 'test_acc:', eval_acc / ti, '%')
+    tqdm.write(f'epoch: {i} acc: {acc / j}%   loss: {loss.item() / j} test_acc: {eval_acc / ti}%')
 
 torch.save(model.state_dict(), 'acnn_params.pkl')
 # eval = torch.from_numpy(np_cat.astype(np.int64))
