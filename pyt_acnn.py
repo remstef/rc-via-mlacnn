@@ -114,7 +114,6 @@ class ACNN(nn.Module):
         return wo.view(bz, 1, self.dc).view(bz, self.dc), rel_weight
 
     def forward(self, x, e1, e2, dist1, dist2, is_training=True):
-        import pdb; pdb.set_trace()
         R = self.new_input_attention(x, e1, e2, dist1, dist2, is_training)
         R_star = self.new_convolution(R)
         wo, rel_weight = self.attentive_pooling(R_star)
